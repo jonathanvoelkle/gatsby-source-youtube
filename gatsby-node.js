@@ -45,20 +45,20 @@ exports.sourceNodes = function () {
         store = _ref.store,
         cache = _ref.cache,
         createNodeId = _ref.createNodeId;
-    var channelId = _ref2.channelId,
+    var playlistId = _ref2.playlistId,
         apiKey = _ref2.apiKey,
         _ref2$maxVideos = _ref2.maxVideos,
         maxVideos = _ref2$maxVideos === undefined ? 50 : _ref2$maxVideos;
-    var createNode, createVideoNodesFromChannelId;
+    var createNode, createVideoNodesFromPlaylistId;
     return regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
             createNode = boundActionCreators.createNode;
 
-            createVideoNodesFromChannelId = function () {
-              var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(channelId, apiKey) {
-                var api, videos, channelResp, channelData, _videos, uploadsId, pageSize, videoResp, _videos2, nextPageToken;
+            createVideoNodesFromPlaylistId = function () {
+              var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(playlistId, apiKey) {
+                var api, videos, playlistResp, playlistData, _videos, pageSize, videoResp, _videos2, nextPageToken;
 
                 return regeneratorRuntime.wrap(function _callee$(_context) {
                   while (1) {
@@ -67,50 +67,49 @@ exports.sourceNodes = function () {
                         api = getApi();
                         videos = [];
                         _context.next = 4;
-                        return api.get("channels?part=contentDetails&id=" + channelId + "&key=" + apiKey);
+                        return api.get("playlists?part=contentDetails&id=" + playlistId + "&key=" + apiKey);
 
                       case 4:
-                        channelResp = _context.sent;
-                        channelData = channelResp.data.items[0];
+                        playlistResp = _context.sent;
+                        playlistData = playlistResp.data.items[0];
 
-                        if (!channelData) {
-                          _context.next = 22;
+                        if (!playlistData) {
+                          _context.next = 21;
                           break;
                         }
 
-                        uploadsId = get(channelData, "contentDetails.relatedPlaylists.uploads");
                         pageSize = Math.min(50, maxVideos);
-                        _context.next = 11;
-                        return api.get("playlistItems?part=snippet%2CcontentDetails%2Cstatus&maxResults=" + pageSize + "&playlistId=" + uploadsId + "&key=" + apiKey);
+                        _context.next = 10;
+                        return api.get("playlistItems?part=snippet%2CcontentDetails%2Cstatus&maxResults=" + pageSize + "&playlistId=" + playlistId + "&key=" + apiKey);
 
-                      case 11:
+                      case 10:
                         videoResp = _context.sent;
 
                         (_videos = videos).push.apply(_videos, _toConsumableArray(videoResp.data.items));
 
-                      case 13:
+                      case 12:
                         if (!(videoResp.data.nextPageToken && videos.length < maxVideos)) {
-                          _context.next = 22;
+                          _context.next = 21;
                           break;
                         }
 
                         pageSize = Math.min(50, maxVideos - videos.length);
                         nextPageToken = videoResp.data.nextPageToken;
-                        _context.next = 18;
-                        return api.get("playlistItems?part=snippet%2CcontentDetails%2Cstatus&maxResults=" + pageSize + "&pageToken=" + nextPageToken + "&playlistId=" + uploadsId + "&key=" + apiKey);
+                        _context.next = 17;
+                        return api.get("playlistItems?part=snippet%2CcontentDetails%2Cstatus&maxResults=" + pageSize + "&pageToken=" + nextPageToken + "&playlistId=" + playlistId + "&key=" + apiKey);
 
-                      case 18:
+                      case 17:
                         videoResp = _context.sent;
 
                         (_videos2 = videos).push.apply(_videos2, _toConsumableArray(videoResp.data.items));
-                        _context.next = 13;
+                        _context.next = 12;
                         break;
 
-                      case 22:
+                      case 21:
 
                         videos = normalize.normalizeRecords(videos);
                         videos = normalize.createGatsbyIds(videos, createNodeId);
-                        _context.next = 26;
+                        _context.next = 25;
                         return normalize.downloadThumbnails({
                           items: videos,
                           store: store,
@@ -118,14 +117,14 @@ exports.sourceNodes = function () {
                           createNode: createNode
                         });
 
-                      case 26:
+                      case 25:
                         videos = _context.sent;
 
                         normalize.createNodesFromEntities(videos, createNode);
 
                         return _context.abrupt("return");
 
-                      case 29:
+                      case 28:
                       case "end":
                         return _context.stop();
                     }
@@ -133,26 +132,26 @@ exports.sourceNodes = function () {
                 }, _callee, undefined);
               }));
 
-              return function createVideoNodesFromChannelId(_x3, _x4) {
+              return function createVideoNodesFromPlaylistId(_x3, _x4) {
                 return _ref4.apply(this, arguments);
               };
             }();
 
             _context3.prev = 2;
 
-            if (!Array.isArray(channelId)) {
+            if (!Array.isArray(playlistId)) {
               _context3.next = 8;
               break;
             }
 
             _context3.next = 6;
-            return Promise.all(channelId.map(function () {
-              var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(channelIdEntry) {
+            return Promise.all(playlistId.map(function () {
+              var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(playlistIdEntry) {
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                   while (1) {
                     switch (_context2.prev = _context2.next) {
                       case 0:
-                        return _context2.abrupt("return", createVideoNodesFromChannelId(channelIdEntry, apiKey));
+                        return _context2.abrupt("return", createVideoNodesFromPlaylistlId(playlistIdEntry, apiKey));
 
                       case 1:
                       case "end":
@@ -173,7 +172,7 @@ exports.sourceNodes = function () {
 
           case 8:
             _context3.next = 10;
-            return createVideoNodesFromChannelId(channelId, apiKey);
+            return createVideoNodesFromPlaylistId(playlistId, apiKey);
 
           case 10:
             return _context3.abrupt("return");

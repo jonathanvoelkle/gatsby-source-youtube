@@ -34,6 +34,7 @@ exports.normalizeRecords = function (items) {
       title: get(item, "snippet.title"),
       description: get(item, "snippet.description"),
       videoId: get(item, "contentDetails.videoId"),
+      videoPublishedAt: get(item, "contentDetails.videoPublishedAt"),
       privacyStatus: get(item, "status.privacyStatus"),
       channelId: get(item, "snippet.channelId"),
       channelTitle: get(item, "snippet.channelTitle"),

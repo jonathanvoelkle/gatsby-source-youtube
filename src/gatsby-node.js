@@ -31,28 +31,24 @@ function getApi() {
 
 exports.sourceNodes = async (
   { boundActionCreators, store, cache, createNodeId },
-  { channelId, apiKey, maxVideos=50 }
+  { playlistId, apiKey, maxVideos=50 }
 ) => {
   const { createNode } = boundActionCreators;
 
-  const createVideoNodesFromChannelId = async (channelId, apiKey) => {
+  const createVideoNodesFromPlaylistId = async (playlistId, apiKey) => {
     var api = getApi();
     let videos = [];
 
-    const channelResp = await api.get(
-      `channels?part=contentDetails&id=${channelId}&key=${apiKey}`
+    const playlistResp = await api.get(
+      `playlists?part=contentDetails&id=${playlistId}&key=${apiKey}`
     );
 
-    const channelData = channelResp.data.items[0];
-    if (!!channelData) {
-      const uploadsId = get(
-        channelData,
-        "contentDetails.relatedPlaylists.uploads"
-      );
+    const playlistData = playlistResp.data.items[0];
+    if (!!playlistData) {
       let pageSize = Math.min(50, maxVideos);
 
       let videoResp = await api.get(
-        `playlistItems?part=snippet%2CcontentDetails%2Cstatus&maxResults=${pageSize}&playlistId=${uploadsId}&key=${apiKey}`
+        `playlistItems?part=snippet%2CcontentDetails%2Cstatus&maxResults=${pageSize}&playlistId=${playlistId}&key=${apiKey}`
       );
       videos.push(...videoResp.data.items);
 
@@ -60,7 +56,7 @@ exports.sourceNodes = async (
         pageSize = Math.min(50, maxVideos - videos.length);
         let nextPageToken = videoResp.data.nextPageToken;
         videoResp = await api.get(
-          `playlistItems?part=snippet%2CcontentDetails%2Cstatus&maxResults=${pageSize}&pageToken=${nextPageToken}&playlistId=${uploadsId}&key=${apiKey}`
+          `playlistItems?part=snippet%2CcontentDetails%2Cstatus&maxResults=${pageSize}&pageToken=${nextPageToken}&playlistId=${playlistId}&key=${apiKey}`
         );
         videos.push(...videoResp.data.items);
       }
@@ -80,11 +76,11 @@ exports.sourceNodes = async (
   }
 
   try {
-    if(Array.isArray(channelId)) {
-      await Promise.all(channelId.map(async (channelIdEntry) => createVideoNodesFromChannelId(channelIdEntry, apiKey)));
+    if(Array.isArray(playlistId)) {
+      await Promise.all(playlistId.map(async (playlistIdEntry) => createVideoNodesFromPlaylistlId(playlistIdEntry, apiKey)));
     }
     else {
-      await createVideoNodesFromChannelId(channelId, apiKey);
+      await createVideoNodesFromPlaylistId(playlistId, apiKey);
     }
     return;
   } catch (error) {
